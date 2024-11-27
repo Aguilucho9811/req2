@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de Usuario</title>
+    <link rel="stylesheet" href="PerfilGenerico.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <!-- Asegúrate de agregar un id al logo para identificarlo -->
+            <img src="images/ESCUDO-USS_Horizontal_color.png" alt="Logo Universidad San Sebastián" class="logo" id="logo">
+        </div>
+    </header>
+
+    <div class="profile-info-container">
+        <div class="profile-left">
+            <img src="images/profile-placeholder.png" alt="Foto de perfil" id="profileImage" class="profile-img">
+            <div class="profile-details">
+                <p><strong>Nombre:</strong> <span id="nombre"></span></p>
+                <p><strong>Rol:</strong> <span id="rol"></span></p>
+                <p><strong>Sede:</strong> <span id="sede"></span></p>
+                <p><strong>Carrera:</strong> <span id="carrera"></span></p>
+                <p><strong>Año admisión:</strong> <span id="anoAdmisión"></span></p>
+                <p><strong>Correo electrónico:</strong> <span id="email"></span></p>
+            </div>
+        </div>
+        <div class="profile-stats">
+            <a href="chat.html">
+                <button style="padding: 10px 20px; font-size: 16px; cursor: pointer; border: 2px solid #007bff; background-color: #007bff; color: white; border-radius: 5px;">
+                  <i class="fas fa-comment"></i> 
+              </button>
+            </a>
+        </div>
+    </div>
+
+    <div class="about">
+        <label for="descripcion">Acerca del usuario:</label>
+        <textarea id="descripcion" placeholder="Descripción no disponible..." readonly></textarea>
+    </div>
+
+    <section class="subjects">
+        <h2>Materias impartidas</h2>
+        <div class="subject-list" id="subjectList">
+            <!-- Materias se cargarán aquí dinámicamente -->
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            // Agregar funcionalidad de redirección al logo
+            const logo = document.getElementById('logo');
+            logo.addEventListener('click', function () {
+                window.location.href = 'PantallaPrincipal.html'; // Redirigir a PantallaPrincipal.html
+            });
+
+            // Obtener parámetros de la URL
+            const params = new URLSearchParams(window.location.search);
+            const userId = params.get('id');
+
+            if (!userId) {
+                alert('Usuario no especificado');
+                window.location.href = 'PantallaPrincipal.html';
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/usuario/${userId}`);
+                const user = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('nombre').textContent = user.nombre || 'N/A';
+                    document.getElementById('rol').textContent = user.rol === '0' ? 'Estudiante' : 'Tutor';
+                    document.getElementById('sede').textContent = user.sede || 'N/A';
+                    document.getElementById('carrera').textContent = user.carrera || 'N/A';
+                    document.getElementById('anoAdmisión').textContent = user.ano_admision || 'N/A';
+                    document.getElementById('email').textContent = user.email || 'N/A';
+                    document.getElementById('descripcion').value = user.descripcion || 'Sin descripción disponible';
+                } else {
+                    alert('Usuario no encontrado');
+                    window.location.href = 'PantallaPrincipal.html';
+                }
+            } catch (error) {
+                console.error('Error al cargar el perfil:', error);
+                alert('Error al cargar el perfil');
+                window.location.href = 'PantallaPrincipal.html';
+            }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+    // Obtener el parámetro "id" de la URL para identificar el perfil del usuario
+    const urlParams = new URLSearchParams(window.location.search);
+    const usuarioId = urlParams.get('id');
+
+    if (!usuarioId) {
+        console.error('No se proporcionó un ID de usuario en la URL');
+        return;
+    }
+
+    try {
+        // Realizar la solicitud para obtener los datos del usuario
+        const response = await fetch(`http://localhost:3000/api/usuario/${usuarioId}`);
+        if (!response.ok) {
+            throw new Error('Error al obtener los datos del usuario');
+        }
+
+        const user = await response.json();
+
+        // Actualizar la imagen de perfil
+        if (user.profile_image) {
+            document.getElementById('profileImage').src = user.profile_image; // Ruta de la imagen desde la base de datos
+        } else {
+            document.getElementById('profileImage').src = '/images/default-profile.png'; // Imagen predeterminada
+        }
+
+        // Actualizar otros datos del perfil
+        document.querySelector('.profile-details p:nth-child(1)').innerHTML = `<strong>Nombre:</strong> ${user.nombre}`;
+        document.querySelector('.profile-details p:nth-child(2)').innerHTML = `<strong>Rol:</strong> ${user.rol}`;
+        document.querySelector('.profile-details p:nth-child(3)').innerHTML = `<strong>Sede:</strong> ${user.sede || 'No establecido'}`;
+        document.querySelector('.profile-details p:nth-child(4)').innerHTML = `<strong>Carrera:</strong> ${user.carrera || 'No establecido'}`;
+        document.querySelector('.profile-details p:nth-child(5)').innerHTML = `<strong>Año admisión:</strong> ${user.ano_admision || 'No establecido'}`;
+        document.querySelector('.profile-details p:nth-child(6)').innerHTML = `<strong>Correo electrónico:</strong> ${user.email}`;
+    } catch (error) {
+        console.error('Error al cargar el perfil del usuario:', error);
+        alert('Hubo un problema al cargar la información del perfil. Por favor, inténtelo de nuevo.');
+    }
+});
+
+    </script>
+
+
+</body>
+</html>

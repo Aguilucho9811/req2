@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Chat App</title>
+  <link rel="stylesheet" href="Chat.css">
+  <script defer src="http://localhost:3000/socket.io/socket.io.js"></script>
+  <script defer src="/script.js"></script>
+ 
+</head>
+<body>
+  <header>
+    <div class="logo"><img src="images/ESCUDO-USS_Horizontal_color.png" alt="Universidad San Sebastián" id="logouss"></div>
+
+    
+  </header>
+  <div id="chat-container">
+    <div id="message-container"></div>
+    <form id="send-container">
+      <input type="text" id="message-input" placeholder="Escribe tu mensaje aquí...">
+      <button type="submit" id="send-button">Enviar</button>
+    </form>
+  </div>
+  <script>
+            // Redirección al hacer clic en el logo
+            document.getElementById("logouss").addEventListener('click', function() {
+            window.location.href = "PantallaPrincipal.html";
+        });
+  </script>
+</body>
+</html>

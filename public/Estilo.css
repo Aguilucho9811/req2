@@ -1,0 +1,94 @@
+/* Estilo general */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-image: url('images/campus.png'); /* Imagen de fondo */
+    background-size: cover;
+    background-position: center;
+}
+
+/* Barra de navegación */
+.nav-bar {
+    background-color: #1a2b49;
+    height: 81px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    color: white;
+}
+
+.nav-bar .logo {
+    height: 50px;
+    margin-right: 10px;
+}
+
+.nav-bar .university-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Contenedor principal */
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+/* Caja de formulario compartida para login y registro */
+.login-box, .register-box {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    text-align: center;
+}
+
+/* Estilos comunes para formularios */
+.login-box label, .register-box label {
+    display: block;
+    text-align: left;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.login-box input, .register-box input,
+.login-box select, .register-box select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.login-box button, .register-box button {
+    width: 100%;
+    padding: 10px;
+    background-color: #0033A0;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.login-box button:hover, .register-box button:hover {
+    background-color: #002370;
+}
+
+.forgot-password {
+    display: block;
+    margin-top: 10px;
+    color: #0033A0;
+    text-decoration: none;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+}

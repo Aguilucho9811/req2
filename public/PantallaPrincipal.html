@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pantalla Principal</title>
+  <link rel="stylesheet" href="PantallaPrincipal.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css' rel='stylesheet' />
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js'></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+  <header class="header">
+    <div class="logo"><img src="images/ESCUDO-USS_Horizontal_color.png" alt="Universidad San Sebastián" id="logouss">
+    </div>
+
+    <div class="search-container">
+      <input type="text" placeholder="Buscar usuario" class="search-bar" id="searchInput">
+      <button class="search-btn" id="searchButton"><i class="fas fa-search"></i></button>
+    </div>
+
+    <!--<div id="searchResults" class="search-results"></div>
+  -->
+
+    <div>
+      <nav class="nav">
+        <a href="impresora.html">
+        <button style="padding: 10px 20px; font-size: 16px; cursor: pointer; border: 2px solid #2C3E50; background-color: #2C3E50; color: white; border-radius: 5px;">
+          <i class="fas fa-print"></i> 
+      </button>
+    </a>
+      
+        <a href="#" class="nav-link" id="userRole">Estudiante</a>
+        <a href="#" class="nav-link"><i class="fas fa-bell"></i></a>
+        <img src="images/termait.png" alt="Perfil" class="profile-img" id="profileImage" style="cursor: pointer;">
+        <a href="#" class="logout-link" id="logoutLink">Cerrar sesión</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="centro">
+    <div class="buscador_materias">
+      <div id="searchResults" class="search-results"></div>
+      
+    </div>
+    <div class="calendar">
+      <div id="calendar"></div>
+    </div>
+  </div>
+
+  <h2 style="text-align: center;margin-top: 50px;background-color: #1a2b49; color: white;">Top Tutores </h2>
+  <div class="top-tutors">
+    <div class="tutor-cardleft">
+      <p>Tutor 1</p>
+      <p>Especialidad: Matemáticas</p>
+    </div>
+    <div class="tutor-cardcenter">
+      <p>Tutor 2</p>
+      <p>Especialidad: Física</p>
+    </div>
+    <div class="tutor-cardright">
+      <p>Tutor 3</p>
+      <p>Especialidad: Programación</p>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async function () {
+      const usuarioId = localStorage.getItem('usuarioId');
+
+      if (!usuarioId) return;
+
+      try {
+        const response = await fetch(`http://localhost:3000/api/usuario/${usuarioId}`);
+        const user = await response.json();
+
+        if (response.ok && user.profile_image) {
+          document.getElementById('profileImage').src = user.profile_image; // URL desde la base de datos
+        }
+      } catch (error) {
+        console.error('Error al cargar la imagen de perfil:', error);
+      }
+    });
+  </script>
+
+  <script>
+    // Redirección al hacer clic en la imagen de perfil
+    document.getElementById('profileImage').addEventListener('click', function () {
+      const userRole = localStorage.getItem('usuarioRole');
+      if (userRole === '0') {
+        window.location.href = "PerfilEstudiante.html";
+      } else if (userRole === '1') {
+        window.location.href = "PerfilTutor.html";
+      } else {
+        window.location.href = "Login.html";
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const calendarEl = document.getElementById('calendar');
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        dateClick: function (info) {
+          const eventTitle = prompt('Ingrese el título del evento:');
+          if (eventTitle) {
+            calendar.addEvent({
+              title: eventTitle,
+              start: info.dateStr,
+              allDay: true
+            });
+          }
+        },
+        events: []
+      });
+      calendar.render();
+    });
+
+    // Buscar usuarios y redirigir al perfil del seleccionado
+    document.getElementById('searchButton').addEventListener('click', async function () {
+      const searchValue = document.getElementById('searchInput').value.trim();
+      if (!searchValue) return;
+
+      try {
+        const response = await fetch(`http://localhost:3000/api/buscar?query=${encodeURIComponent(searchValue)}`);
+        if (!response.ok) {
+          throw new Error('Error al buscar usuarios');
+        }
+
+        const users = await response.json();
+        const resultsContainer = document.getElementById('searchResults');
+
+        resultsContainer.innerHTML = users
+          .map(user => `<div class="search-result" data-id="${user.id}">${user.nombre} - ${user.email}</div>`)
+          .join('');
+
+        document.querySelectorAll('.search-result').forEach(result => {
+          result.addEventListener('click', function () {
+            const userId = result.getAttribute('data-id');
+            window.location.href = `PerfilGenerico.html?id=${userId}`;
+          });
+        });
+      } catch (error) {
+        console.error('Error al buscar usuarios:', error);
+      }
+    });
+
+
+    document.getElementById('logoutLink').addEventListener('click', function () {
+      localStorage.removeItem('usuarioId');
+      localStorage.removeItem('usuarioRole');
+      window.location.href = '/index.html';
+    });
+
+    // Permitir búsqueda con Enter
+    document.getElementById('searchInput').addEventListener('keydown', function (event) {
+      if (event.key === 'Enter') {
+        document.getElementById('searchButton').click();
+      }
+    });
+
+    // Cargar el rol del usuario
+    window.onload = function () {
+      const userRole = localStorage.getItem('usuarioRole');
+      if (userRole) {
+        const roleText = userRole === '0' ? 'Estudiante' : 'Tutor';
+        document.getElementById('userRole').textContent = roleText;
+      } else {
+        window.location.href = "index.html";
+      }
+    };
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio de Sesión - Universidad San Sebastián</title>
+    <link rel="stylesheet" href="Estilo.css"> <!-- Enlace al CSS -->
+</head>
+<body>
+    <!-- Barra superior con el logo -->
+    <header>
+        <div class="nav-bar">
+            <img src="/images/ESCUDO-USS_Horizontal_color.png" alt="Universidad San Sebastián" class="logo">
+            
+        </div>
+    </header>
+
+    <!-- Contenedor principal -->
+    <div class="container">
+        <!-- Formulario de inicio de sesión -->
+        <div class="login-box" id="loginBox">
+            <h2>Inicia Sesión</h2>
+            <!-- Formulario de login -->
+            <form id="loginForm">
+                <label for="email">Correo electrónico</label>
+                <input type="email" id="email" placeholder="Ejemplo@correo.uss.cl" required>
+                
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" placeholder="**********" required>
+                
+                <button type="submit" class="login-button">Iniciar Sesión</button>
+
+                <div class="links">
+                    <a href="#" class="forgot-password">¿Olvidó la contraseña?</a>
+                    <a href="#" class="create-account" id="showRegisterForm">¿Aún no tiene cuenta? Cree una</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Formulario de registro (oculto por defecto) -->
+        <div class="register-box" id="registerForm" style="display: none;">
+            <h2>Registro</h2>
+            <form>
+                <label for="name">Nombre</label>
+                <input type="text" id="name" placeholder="Ingrese su nombre" required>
+
+                <label for="email">Correo electrónico</label>
+                <input type="email" id="registerEmail" placeholder="Ejemplo@correo.uss.cl" required>
+
+                <label for="password">Contraseña</label>
+                <input type="password" id="registerPassword" placeholder="**********" required>
+
+                <label for="birthdate">Fecha de nacimiento</label>
+                <input type="date" id="birthdate" required>
+
+                <label for="role">Seleccione su rol</label>
+                <select id="role" required>
+                    <option value="" disabled selected>Seleccione una opción</option>
+                     <option value="0">Estudiante</option>  <!-- 0 para Estudiante -->
+                     <option value="1">Tutor</option>      <!-- 1 para Tutor -->
+                </select>
+
+                <button type="submit" class="register-button">Crear Cuenta</button>
+
+                <div class="links">
+                    <a href="#" class="forgot-password" id="showLoginForm">¿Ya tiene una cuenta? Inicie sesión</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts para alternar formularios y manejar login -->
+    <script>
+        // Función para manejar el inicio de sesión
+        async function handleLogin(e) {
+            e.preventDefault(); // Evitar el envío del formulario de forma tradicional
+    
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // https://ayudantias-1.onrender.com/api/login   //http://localhost:3000/api/login
+            try {
+                const response = await fetch('http://localhost:3000/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+    
+                const data = await response.json();
+                if (response.ok) {
+                    // Guardar el ID del usuario en localStorage
+                    localStorage.setItem('usuarioId', data.user.id);
+                    localStorage.setItem('usuarioRole', data.user.role);  // Guardar el rol
+                    alert(data.message); // Inicio de sesión exitoso
+                    window.location.href = '/PantallaPrincipal.html'; // Redirigir a la pantalla principal
+                    // Mostrar mensaje y redirigir a la pantalla principal
+
+                } else {
+                    alert(data.message); // Mostrar error
+                }
+            } catch (err) {
+                console.error('Error en la solicitud:', err);
+            }
+        }
+    
+        // Vincular la función handleLogin al evento submit del formulario de login
+        document.getElementById('loginForm').addEventListener('submit', handleLogin);
+
+
+        // Función para manejar el registro
+        async function handleRegister(e) {
+            e.preventDefault();
+
+            const nombre = document.getElementById('name').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const birthdate = document.getElementById('birthdate').value;
+            const role = document.getElementById('role').value; // Este valor será "0" o "1"
+
+
+                    //https://ayudantias-1.onrender.com/   http://localhost:3000/api/register
+            try {
+                const response = await fetch('http://localhost:3000/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password, nombre, birthdate, rol: role }) // Asegúrate de pasar el rol correctamente
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    alert(data.message);
+                    document.getElementById('registerForm').style.display = 'none';
+                    document.getElementById('loginBox').style.display = 'block';
+                } else {
+                    alert(data.message);
+                }
+            } catch (err) {
+                console.error('Error en la solicitud:', err);
+            }
+        }
+        // Vincular la función handleLogin al evento submit del formulario de login
+        document.getElementById('loginForm').addEventListener('submit', handleLogin);
+
+        // Alternar entre el formulario de login y registro
+        document.getElementById('showRegisterForm').addEventListener('click', function() {
+            document.getElementById('loginBox').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+        });
+
+        document.getElementById('showLoginForm').addEventListener('click', function() {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginBox').style.display = 'block';
+        });
+
+
+
+        // Vincular la función handleRegister al evento submit del formulario de registro
+        document.querySelector('.register-box form').addEventListener('submit', handleRegister);
+
+        window.onload = function() {
+        const userId = localStorage.getItem('usuarioId');
+        const userRole = localStorage.getItem('usuarioRole');
+
+        // Verificar si el usuario ya está logueado
+        if (userId && userRole) {
+            // Redirigir según el rol
+            if (userRole === '0') {
+                window.location.href = '/PantallaPrincipal.html';  // Redirigir a la página de Estudiante
+            } else if (userRole === '1') {
+                window.location.href = '/PantallaPrincipal.html';      // Redirigir a la página de Tutor
+            } else {
+                alert('Rol de usuario no reconocido.');
+                window.location.href = '/index.html'; // En caso de no reconocer el rol
+            }
+        }
+    };
+
+
+    </script>
+    
+    
+</body>
+</html>

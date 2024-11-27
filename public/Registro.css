@@ -1,0 +1,90 @@
+/* Estilo general */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-image: url('/images/campus.png'); /* Imagen de fondo */
+    background-size: cover; /* La imagen cubrirá todo el fondo */
+    background-position: center; /* Centrado de la imagen */
+}
+
+/* Barra de navegación */
+.nav-bar {
+    display: flex;
+    align-items: center;
+    background-color: #003366;
+    padding: 10px;
+}
+
+.logo {
+    height: 50px;
+    margin-right: 10px;
+}
+
+.university-name {
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* Contenedor principal */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Caja de registro */
+.register-box {
+    background-color: rgba(255, 255, 255, 0.9); /* Fondo blanco con un poco de opacidad */
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    text-align: center;
+}
+
+h2 {
+    margin-bottom: 20px;
+    color: #003366;
+}
+
+/* Estilo de los campos de formulario */
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-top: 10px;
+    text-align: left;
+    font-weight: bold;
+    color: #333;
+}
+
+input, select {
+    margin-top: 5px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #003366;
+}
+
+/* Botón de registro */
+.register-button {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #003366;
+    color: white;
+    border: none;
+}

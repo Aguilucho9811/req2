@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Universidad San Sebastián</title>
+    <link rel="stylesheet" href="Registro.css"> <!-- Enlace al CSS -->
+</head>
+<body>
+    <header>
+        <div class="nav-bar">
+            <img src="/images/ESCUDO-USS_Horizontal_color.png" alt="Universidad San Sebastián" class="logo">
+            <span class="university-name">Universidad San Sebastián</span>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="register-box">
+            <h2>Registro</h2>
+            <form id="registerForm">
+                <label for="name">Nombre</label>
+                <input type="text" id="name" placeholder="Ingrese su nombre" required>
+
+                <label for="email">Correo electrónico</label>
+                <input type="email" id="email" placeholder="Ejemplo@correo.uss.cl" required>
+
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" placeholder="**********" required>
+
+                <label for="birthdate">Fecha de nacimiento</label>
+                <input type="date" id="birthdate" required>
+
+                <label for="role">Seleccione su rol</label>
+                <select id="role" required>
+                    <option value="" disabled selected>Seleccione una opción</option>
+                    <option value="Estudiante">Estudiante</option>
+                    <option value="Tutor">Tutor</option>
+                </select>
+
+                <button type="submit" class="register-button">Crear Cuenta</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

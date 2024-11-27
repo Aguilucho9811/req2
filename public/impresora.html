@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Enviar a Imprimir</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #e6e6e6;
+    }
+
+    header {
+      background-color: #102a43;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+    }
+
+    header img {
+      height: 50px;
+      margin-right: 20px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    main {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: calc(100vh - 80px); /* Ajusta según el tamaño del header */
+    }
+
+    .upload-container {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      width: 400px;
+    }
+
+    .upload-container h1 {
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .upload-container input[type="file"] {
+      display: block;
+      margin: 10px auto 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 5px;
+      font-size: 16px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .upload-container button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .upload-container button:hover {
+      background-color: #0056b3;
+    }
+
+    .message {
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    .message.error {
+      color: red;
+    }
+
+    .message.success {
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="images/ESCUDO-USS_Horizontal_color.png" alt="Universidad San Sebastián" />
+    
+  </header>
+  <main>
+    <div class="upload-container">
+      <h1>Enviar Archivo a Imprimir</h1>
+      <form id="upload-form">
+        <input type="file" id="file-input" name="file" accept=".pdf,.doc,.docx,.jpg,.png">
+        <button type="submit">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="white" style="margin-right: 5px;">
+            <path d="M19 7h-1V3H6v4H5C3.9 7 3 7.9 3 9v6h4v4h10v-4h4V9c0-1.1-.9-2-2-2zm-3 10H8v-5h8v5zm0-7H5V9h14v1zm-8-4h4V4h-4v2z"/>
+          </svg>
+          Enviar
+        </button>
+      </form>
+      <div id="message" class="message"></div>
+    </div>
+  </main>
+  <script>
+    const uploadForm = document.getElementById('upload-form');
+    const fileInput = document.getElementById('file-input');
+    const messageDiv = document.getElementById('message');
+
+    uploadForm.addEventListener('submit', async (e) => {
+      e.preventDefault(); // Prevenir la recarga de la página
+      messageDiv.innerText = ''; // Limpiar mensajes previos
+
+      if (!fileInput.files[0]) {
+        messageDiv.innerText = 'Por favor, selecciona un archivo.';
+        messageDiv.classList.add('error');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+
+      try {
+        const response = await fetch('/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          messageDiv.innerText = result.message;
+          messageDiv.className = 'message success';
+        } else {
+          throw new Error(result.message || 'Error desconocido');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        messageDiv.innerText = 'Hubo un problema al enviar el archivo.';
+        messageDiv.className = 'message error';
+      }
+    });
+  </script>
+</body>
+</html>

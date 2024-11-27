@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados de Búsqueda</title>
+    <link rel="stylesheet" href="ResultadosBusqueda.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <img src="images/ESCUDO-USS_Horizontal_color.png" alt="Universidad San Sebastián" id="logouss">
+            <input type="text" placeholder="Buscar usuario" class="search-bar" id="searchInput">
+            <button class="search-btn" id="searchButton"><i class="fas fa-search"></i></button>
+        </div>
+        
+    </header>
+    <main>
+        <h2>Resultados para "<span id="queryText"></span>"</h2>
+        <div id="resultadosContainer" class="resultados-grid"></div>
+    </main>
+    <footer>
+        <div class="pagination">
+            <button id="prevPage">← Anterior</button>
+            <button id="nextPage">Siguiente →</button>
+        </div>
+
+    <script>
+
+        // Redirección al hacer clic en el logo
+            document.getElementById("logouss").addEventListener('click', function() {
+            window.location.href = "PantallaPrincipal.html";
+        });
+
+                // Evento para el botón de búsqueda usuarios
+                document.getElementById('searchButton').addEventListener('click', function() {
+        const searchValue = document.getElementById('searchInput').value.trim();
+        if (searchValue) {
+            // Redirigir a la página de resultados de búsqueda
+            window.location.href = `ResultadosBusqueda.html?query=${encodeURIComponent(searchValue)}`;
+        }
+    });
+
+    // Permitir búsqueda al presionar "Enter"
+    document.getElementById('searchInput').addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            const searchValue = event.target.value.trim();
+            if (searchValue) {
+                // Redirigir a la página de resultados de búsqueda
+                window.location.href = `ResultadosBusqueda.html?query=${encodeURIComponent(searchValue)}`;
+            }
+        }
+    });
+
+
+
+// carga la busqueda
+document.addEventListener("DOMContentLoaded", () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const query = urlParams.get("query");
+    const queryText = document.getElementById("queryText");
+    const resultadosContainer = document.getElementById("resultadosContainer");
+    let currentPage = 1;
+    const resultsPerPage = 10;
+
+    if (query) {
+        queryText.textContent = query;
+        fetchResultados(query, currentPage);
+    } else {
+        alert("No se ingresó ningún término de búsqueda");
+        window.location.href = "PantallaPrincipal.html";
+    }
+
+    function fetchResultados(query, page) {
+        fetch(`https://ayudantias-1.onrender.com/api/buscarUsuarios?query=${encodeURIComponent(query)}&page=${page}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("No se encontraron resultados");
+                }
+                return response.json();
+            })
+            .then(data => {
+                resultadosContainer.innerHTML = "";
+
+                if (data.length > 0) {
+                    data.forEach(usuario => {
+                        const usuarioDiv = document.createElement("div");
+                        usuarioDiv.classList.add("resultado");
+                        usuarioDiv.innerHTML = `
+                            <p><strong>Nombre:</strong> ${usuario.nombre}</p>
+                            <p><strong>Correo:</strong> ${usuario.email}</p>
+                            <p><strong>Rol:</strong> ${usuario.rol === "1" ? "Tutor" : "Estudiante"}</p>
+                        `;
+                        usuarioDiv.addEventListener("click", () => {
+                            window.location.href = `PerfilUsuario.html?id=${usuario.id}`;
+                        });
+                        resultadosContainer.appendChild(usuarioDiv);
+                    });
+                } else {
+                    resultadosContainer.innerHTML = '<p>No se encontraron usuarios</p>';
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                resultadosContainer.innerHTML = `<p>Error: ${error.message}</p>`;
+            });
+    }
+
+    document.getElementById("prevPage").addEventListener("click", () => {
+        if (currentPage > 1) {
+            currentPage--;
+            fetchResultados(query, currentPage);
+        }
+    });
+
+    document.getElementById("nextPage").addEventListener("click", () => {
+        currentPage++;
+        fetchResultados(query, currentPage);
+    });
+});
+    </script>
+</body>
+</html>

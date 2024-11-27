@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil del Estudiante</title>
+    <link rel="stylesheet" href="PerfilEstudiante.css">
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <img src="/images/ESCUDO-USS_Horizontal_color.png" alt="Logo Universidad San Sebastián" class="logo"
+                id="logouss">
+
+            <input type="text" placeholder="Buscar" class="search-bar">
+        </div>
+    </header>
+
+    <div class="profile-info-container">
+        <div class="profile-left">
+            <img src="/images/termait.png" alt="Foto de perfil" class="profile-img" id="profileImage">
+            <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+            <div class="profile-details">
+                <p><strong>Nombre:</strong> Apellido Apellido2</p>
+                <p><strong>Rol:</strong> Estudiante</p>
+                <p><strong>Sede:</strong> No establecido</p>
+                <p><strong>Carrera:</strong> No establecido</p>
+                <p><strong>Año admisión:</strong> No establecido</p>
+                <p><strong>Correo electrónico:</strong> ejemplo@correo.uss.cl</p>
+            </div>
+        </div>
+
+        <div class="profile-stats">
+            <i class="heart-icon">❤️</i>
+            <p>100</p>
+            <div class="rating">★★★★☆</div>
+        </div>
+    </div>
+
+    <section class="about">
+        <label for="description">Cuéntanos sobre ti:</label>
+        <textarea id="description" placeholder="Agrega una breve descripción sobre ti..." readonly></textarea>
+        <button id="editDescriptionBtn">Editar Descripción</button>
+    </section>
+
+    <section class="subjects">
+        <h2>Materias en curso</h2>
+        <div class="subject-list">
+            <div class="subject">Cálculo Multivariable</div>
+            <div class="subject">Álgebra</div>
+            <div class="subject">Cálculo Diferencial</div>
+            <div class="subject">Programación Avanzada</div>
+        </div>
+    </section>
+
+    <section class="account-actions">
+        <button id="deleteAccountBtn" class="delete-button">Borrar Cuenta</button>
+    </section>
+
+    <script>
+        document.getElementById('deleteAccountBtn').addEventListener('click', function () {
+            if (confirm('¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.')) {
+                const usuarioId = localStorage.getItem('usuarioId');
+
+                fetch(`http://localhost:3000/api/usuario/${usuarioId}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                    .then(response => {
+                        if (!response.ok) throw new Error('Error al eliminar la cuenta');
+                        alert('Cuenta eliminada exitosamente');
+                        localStorage.removeItem('usuarioId');
+                        window.location.href = 'index.html';
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('No se pudo eliminar la cuenta. Inténtalo de nuevo más tarde.');
+                    });
+            }
+        });
+
+
+
+    </script>
+
+    <script>
+        document.getElementById('imageUpload').addEventListener('change', async function (event) {
+            const usuarioId = localStorage.getItem('usuarioId');
+            const file = event.target.files[0];
+
+            if (!file || !usuarioId) return;
+
+            const formData = new FormData();
+            formData.append('profileImage', file);
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/usuario/${usuarioId}/profile-image`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    document.getElementById('profileImage').src = data.imageUrl; // Actualizar la imagen en el frontend
+                    alert('Imagen actualizada correctamente');
+                } else {
+                    alert('Error al actualizar la imagen');
+                }
+            } catch (error) {
+                console.error('Error al cargar la imagen:', error);
+                alert('Error al cargar la imagen');
+            }
+        });
+
+    </script>
+
+    
+    
+       <script>
+    document.addEventListener('DOMContentLoaded', async function () {
+      const usuarioId = localStorage.getItem('usuarioId');
+
+      if (!usuarioId) return;
+
+      try {
+        const response = await fetch(`http://localhost:3000/api/usuario/${usuarioId}`);
+        const user = await response.json();
+
+        if (response.ok && user.profile_image) {
+          document.getElementById('profileImage').src = user.profile_image; // URL desde la base de datos
+        }
+      } catch (error) {
+        console.error('Error al cargar la imagen de perfil:', error);
+      }
+    });
+  </script>
+    
+
+
+    <script>
+
+        window.onload = function () {
+            const usuarioRole = localStorage.getItem('usuarioRole');
+            // Si no hay rol en el localStorage, redirigir al login
+            if (usuarioRole !== '0') {  // '0' es el rol de estudiante
+                window.location.href = "index.html";  // Redirigir al login
+            }
+        };
+
+
+        // Redirección al hacer clic en el logo
+        document.getElementById("logouss").addEventListener('click', function () {
+            window.location.href = "PantallaPrincipal.html";
+        });
+
+        // Subir una nueva imagen de perfil
+        document.getElementById('profileImage').addEventListener('click', function () {
+            document.getElementById('imageUpload').click();
+        });
+
+        document.getElementById('imageUpload').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('profileImage').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Habilitar/deshabilitar edición del cuadro de descripción
+        const descriptionTextarea = document.getElementById('description');
+        const editDescriptionBtn = document.getElementById('editDescriptionBtn');
+
+        editDescriptionBtn.addEventListener('click', function () {
+            const isReadonly = descriptionTextarea.hasAttribute('readonly');
+            if (isReadonly) {
+                descriptionTextarea.removeAttribute('readonly');
+                descriptionTextarea.focus();
+                editDescriptionBtn.textContent = 'Guardar Descripción';
+            } else {
+                descriptionTextarea.setAttribute('readonly', true);
+                editDescriptionBtn.textContent = 'Editar Descripción';
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // Suponiendo que tienes el ID del usuario almacenado en localStorage después del login
+            const usuarioId = localStorage.getItem('usuarioId'); // Asegúrate de haber almacenado el ID del usuario en algún momento
+
+            if (!usuarioId) {
+                alert('Usuario no autenticado');
+                window.location.href = "index.html"; // Redirige al login si el usuario no está autenticado
+                return;
+            }
+
+            // Realizar solicitud para obtener los datos del usuario desde la API
+            // Puedes utilizar tu propia API, como mencionas: https://ayudantias-1.onrender.com/api/usuario/${usuarioId}     http://localhost:3000/api/usuario/${usuarioId}  
+            fetch(`https://ayudantias-1.onrender.com/api/usuario/${usuarioId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('No se pudieron obtener los datos del usuario');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Actualizar los campos del perfil con los datos recibidos
+                    document.querySelector('.profile-details p:nth-child(1)').innerHTML = `<strong>Nombre:</strong> ${data.nombre} ${data.apellido || ''} ${data.apellido2 || ''}`;
+                    document.querySelector('.profile-details p:nth-child(2)').innerHTML = `<strong>Rol:</strong> ${data.rol || 'Estudiante'}`;
+                    // Aquí puedes descomentar los siguientes campos si los recibes en los datos
+                    // document.querySelector('.profile-details p:nth-child(3)').innerHTML = `<strong>Sede:</strong> ${data.sede}`;
+                    // document.querySelector('.profile-details p:nth-child(4)').innerHTML = `<strong>Carrera:</strong> ${data.carrera}`;
+                    // document.querySelector('.profile-details p:nth-child(5)').innerHTML = `<strong>Año admisión:</strong> ${data.ano_admision}`;
+                    document.querySelector('.profile-details p:nth-child(6)').innerHTML = `<strong>Correo electrónico:</strong> ${data.email}`;
+
+                    // Si la descripción está guardada, llenarla
+                    if (data.descripcion) {
+                        document.getElementById('description').value = data.descripcion;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Hubo un problema al obtener la información del perfil');
+                });
+        });
+
+    </script>
+
+</body>
+
+</html>
